@@ -8,15 +8,23 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title font color="#3f729b">{{ config('app.name', '筋肉満') }}</title>
     <!--<title>筋肉満</title>-->
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css',true) }}" rel="stylesheet">
+    
+    <!--Font Awesomeのアイコンを埋め込む準備-->
+    <script src="https://kit.fontawesome.com/b7d8a8cbdb.js" crossorigin="anonymous"></script>
+   
+
+<script src="{{ asset('js/app.js') }}" defer></script>
+
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
+        <nav class="navbar navbar-default navbar-static-top" style="background-color: #000033;">
+        <!--<nav class="navbar navbar-default navbar-static-top navbar-dark bg-dark"> -->
             <div class="container">
                 <div class="navbar-header">
 
@@ -77,5 +85,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js',true) }}"></script>
+    
 </body>
 </html>

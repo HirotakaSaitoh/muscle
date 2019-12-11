@@ -12,6 +12,7 @@
         <!-- バリデーションエラーの表示に使用-->
 
         <!-- 本のタイトル -->
+        <!--uploadではなくmovie画面に遷移する-->
         <form enctype="multipart/form-data" action="{{ url('upload') }}" method="POST" class="form-horizontal">    
             {{ csrf_field() }}
 
@@ -29,7 +30,7 @@
                     <!--動画を追加-->
                <div class="col-sm-6">    
                    <label>動画</label>  
-                   <input type="file" name="id"> 
+                   <input type="file" name="item_movie"> 
                </div> 
                
             </div>

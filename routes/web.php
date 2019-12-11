@@ -1,107 +1,76 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
 use App\Movie;
 use Illuminate\Http\Request;
 
-// /**
-// * 動画を表示(top.blade.php)
-// */
-// Route::get('/', function () {
-//     return view('top');
-// });
+// トップページの動画を表示(top.blade.php)
+Route::get('/', 'MoviesController@top');
+
+//topページ でコメントを追加 
+Route::post('/movie/comment_store', 'MoviesController@comment_store');  //comment_storeページと言うviewの無い更新ページを作ってリダイレクトでページに戻す
+
+//topページ いいね機能
+Route::post('/favorite', 'MoviesController@favorite');
+
+
+
+
+//動画のclickで動画を拡大表示
+//Route::match(['get','post'], '/m/{m_name}', 'MoviesController@movie');
+Route::match(['get','post'], '/m/{movie_item_name}', 'MoviesController@movie'); //アカウントページの方法を参考。movie table のitem_nameをURLにできている。
+
+
+
+
+//ログイン認証
+Auth::routes();
+Route::get('/home', 'HomeController@index')->name('home');
+
+
+//accountページの動画を順番に表示
+Route::get('/user/{user_name}', 'MoviesController@index');
+//userはInstagramで言うところの/p/とか/stories/
+//{user_name}は各動画個別のURL
 
 
 //動画追加画面表示 
+Route::get('/upload2', 'MoviesController@upload2'); 
 
 
-Route::get('/upload', function () {     
-     return view('uploads');
-    });
-    
-    
-    
-    
 //動画追加
-Route::post('/upload', function (Request $request) { 
+Route::post('/upload2','MoviesController@store2');  
 //upload -> topに
 
-    //バリデーション
-    $validator = Validator::make($request->all(), [
-        'id' => 'required',
-        // 'user_id' => 'required',
-        // 'movie_url' => 'required',
-        // 'user_comment' => 'required|max:200',
-        // 'published' => 'required',
-      
-    ]);
+
+//ログイン認証チェック 
+Route::group(['middleware' => 'auth'], function () { 
+    //管理ページ (managements.blade.php)に移動
+    Route::get('/management', 'MoviesController@management');
     
-    //バリデーション:エラー
-    if ($validator->fails()) {
-        return redirect('/')
-            ->withInput()
-            ->withErrors($validator);
-    }
+    //管理ページ で情報更新 
+    Route::post('/management/user_update', 'MoviesController@user_update');  //user_updateページと言うviewの無い更新ページを作ってリダイレクトでページに戻す
     
-        //data登録
-        $uploads = new Movie;
-        //$uploads = Movie::where('id',Auth::user()->id)->find($request->id);
-        $uploads->user_id   ='111'; // $request->user_id;
-        $uploads->movie_url = 'test'; //$request->'movie_url';
-        $uploads->user_comment ='test';// $request->user_comment;
-        $uploads->published   = '2017-03-07 00:00:00'; //$request->published;
-        $uploads->save();
-        return redirect('/upload');
-        //後で、topに戻す！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-
-}); 
-
-
-Route::get('/account', function () {  
-    $uploads = Movie::orderBy('created_at', 'asc')->get();
-return view('accounts', [      
-    'uploads' => $uploads    
-    ]); 
+    //パスワード変更ページに移動 (managementPWs.blade.php)
+    Route::get('/management/pw', 'MoviesController@managementPW');
+    
+    //パスワード変更ページでパスワード更新 
+    Route::post('/management/PW_update', 'MoviesController@PW_update');  //PW_updateページと言うviewの無い更新ページを作ってリダイレクトでページに戻す
+    
+    
 });
 
-// /**
-// * 動画を追加(uploads.blade.php)
-// */
-// Route::post('/upload', function (Request $request) {
-    
-    
-    
-    
-    
-//     return view('uploads');
-// });
 
 
-// /**  * 新「本」を追加  */ 
-// Route::post('/books', function (Request $request) {     
-//     // 
-// }); 
+
+//テストのやつ
+Route::get('/test', 'MoviesController@test');  //@はコントローラーと関数を結びつける
 
 
 
 
 
-// use App\User;
-// use Illuminate\Http\Request;
 
-// /**
-// *アカウントページ (acount.blade.php)
-// */
+
 
 // /**
 // * 本を削除 
@@ -109,16 +78,3 @@ return view('accounts', [
 // Route::delete('', function () {
 //     //
 // });
-
-
-// use App\Movie;
-// use Illuminate\Http\Request;
-
-// /**
-// *管理ページ (management.blade.php)
-// */
-
-
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');

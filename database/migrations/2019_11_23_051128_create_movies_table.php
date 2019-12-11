@@ -17,6 +17,7 @@ class CreateMoviesTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->index();//投稿したユーザーのID）[i:ユーザーの投稿動画を検索する]
             $table->string('movie_url')->nullable; //動画URL
+            $table->string('item_movie'); //動画の名前
             $table->string('user_comment',200)->nullable;// 投稿者コメント
             $table->dateTime('published');// 投稿日時 [i:投稿日時でソートすることがあるなら
             $table->timestamps();

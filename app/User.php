@@ -26,3 +26,12 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 }
+
+// class User extends Model
+// {
+//   //hasMany設定
+//   public function movie()
+//   {
+//   return $this->hasMany('App\Movie');
+//   }
+// }

@@ -18,7 +18,13 @@ class Movie extends Model
 //   return $this->belongsTo('App\User');
 //   }
   
-  
+  //いいねの数を表示させる関数
+  public function favorite_users(){
+            return $this->belongsToMany(User::class,'favorite','movie_id','user_id')->withTimestamps();
+    }
   
   
 }
+
+
+

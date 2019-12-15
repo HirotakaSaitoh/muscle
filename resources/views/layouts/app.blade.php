@@ -18,12 +18,13 @@
     <script src="https://kit.fontawesome.com/b7d8a8cbdb.js" crossorigin="anonymous"></script>
    
 
-<script src="{{ asset('js/app.js') }}" defer></script>
+<!--<script src="{{ asset('js/app.js') }}" defer></script>-->
 
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top" style="background-color: #000033;">
+        <nav class="navbar navbar-default navbar-static-top" style="background-color: #003B46;">
+            <!--2A3132   003B46 021C1E CDCDC0 1E1F26-->
         <!--<nav class="navbar navbar-default navbar-static-top navbar-dark bg-dark"> -->
             <div class="container">
                 <div class="navbar-header">

@@ -17,8 +17,8 @@ class CreateMgoodsTable extends Migration
             $table->increments('id');
             $table->integer('movie_id')->index();//投稿したユーザーのID）[i:ユーザーの投稿動画を検索する]
             $table->integer('user_id');// user_id（投げ銭したユーザーのID）
+            $table->boolean('delete_flag');// いいね取り消し時のカウント
             $table->timestamps(); //投稿タイミング
-            $table->dateTime('time');// 投稿日時 [i:投稿日時でソートすることがあるなら
         });
     }
     /**

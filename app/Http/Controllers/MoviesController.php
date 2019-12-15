@@ -46,11 +46,7 @@ class MoviesController extends Controller
         //取ってきたい動画の数と条件を指定してここに書く
         //ログインしたアカウントの最新動画順を全部表示させる
         
-        return view('accounts', [      
-        'query' => $query,
-        'query2' => $query2,
-        'myData' => $myData
-          ]);
+        return view('accounts', ['query' => $query, 'query2' => $query2, 'myData' => $myData]);
     }
     
     
@@ -86,66 +82,90 @@ class MoviesController extends Controller
     
     
     
-    //topページコメント追加********************************************************* 
+    //topページコメント追加(非同期処理)********************************************************* 
     public function comment_store(Request $request){
-        $myData = Auth::user();
-        $uploads = Movie::orderBy('created_at', 'desc')->first(); 
+        //$myData = Auth::user();
+       // $uploads = Movie::orderBy('created_at', 'desc')->first(); 
        // $movieInfo = Movie::find($request->id);  //MovieのIDを取得する
         $movieComment = new Moviecomment; 
-        $movieComment -> movie_id = $request->id; 
-        $movieComment -> user_id = $myData->id;
+        $movieComment -> movie_id = $request->movie_id; 
+        $movieComment -> user_id = $request->user_id;
         $movieComment -> movie_comment = $request->movie_comment;
-        $movieComment -> comment_time = $request->published;
-        
+        $movieComment -> comment_time = $request->playtime;
         $movieComment -> save();//databaseにコメント情報を登録したい
      
-       return redirect('/');
-    }     
+       //return redirect('/');
+    }
+    
+    
     
      
     //topページいいね機能(いいねを押すとエラーが出る　"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'c9.post' doesn't exist (SQL: select * from `post` where `movie_id` is null limit 1)")*******************************************************
-    public function favorite(Request $request){
+    // public function favorite(Request $request){
         
-        $movie_id = $request->id;
-        $name = Mgood::where('movie_id', $movie_id)->get(['user_id']);//TOPに表示されている動画のいいね情報をGET
+    //     $movie_id = $request->id;
+    //     $name = Mgood::where('movie_id', $movie_id)->get(['user_id']);//TOPに表示されている動画のいいね情報をGET
          
         
-        if($name=""){       //誰もいいねしていないならば→いいね登録
-            $names = Auth::user()->id;
-            DB::insert('insert into mgoods (movie_id, user_id) values (?,?)',[$movie_id,$names]);            
-            $judge = [$movie_id,$names];
-            return view('top', ['judge' => $judge, 'd' => $movie_id]);
+    //     if($name=""){       //誰もいいねしていないならば→いいね登録
+    //         $names = Auth::user()->id;
+    //         DB::insert('insert into mgoods (movie_id, user_id) values (?,?)',[$movie_id,$names]);            
+    //         $judge = [$movie_id,$names];
+    //         return view('top', ['judge' => $judge, 'd' => $movie_id]);
             
-        }else{      //誰かがいいねをしているならば
+    //     }else{      //誰かがいいねをしているならば
             
-            //$names = $name[2];   //mgoodsテーブルのuser_id
-            //$user = Auth::user();
-            //$favname = $user['name'];//ログインユーザー情報のnameだけ取ってくる。
-           $judge = Mgood::select('select * from mgoods where movie_id = ? and user_id = ?', [$movie_id, $name]);
-           // $judge = DB::select('select * from mgoods where movie_id = ? and user_id = ?', [$movie_id, $name]);
+    //         //$names = $name[2];   //mgoodsテーブルのuser_id
+    //         //$user = Auth::user();
+    //         //$favname = $user['name'];//ログインユーザー情報のnameだけ取ってくる。
+    //       $judge = Mgood::select('select * from mgoods where movie_id = ? and user_id = ?', [$movie_id, $name]);
+    //       // $judge = DB::select('select * from mgoods where movie_id = ? and user_id = ?', [$movie_id, $name]);
             
-            if(!$judge){
-                DB::insert('insert into mgoods (movie_id, user_id) values (?,?)',[$movie_id,$name]);            
-                $judge = [$movie_id,$name];
-            }else{
-                DB::delete('delete from mgoods where movie_id = ? and user_id = ?',[$movie_id,$name]);     
+    //         if(!$judge){
+    //             DB::insert('insert into mgoods (movie_id, user_id) values (?,?)',[$movie_id,$name]);            
+    //             $judge = [$movie_id,$name];
+    //         }else{
+    //             DB::delete('delete from mgoods where movie_id = ? and user_id = ?',[$movie_id,$name]);     
     
-            }
+    //         }
     
-            //return redirect()->back()->withInput();
-            return view('top', ['judge' => $judge, 'd' => $movie_id]);
+    //         //return redirect()->back()->withInput();
+    //         return view('top', ['judge' => $judge, 'd' => $movie_id]);
 
-    }}
+    // }}
+    
+    
+    
+    //topページいいね機能(非同期処理)*********************************************************************
+    public function favorite(Request $request){ //DBの受け渡し
+    
+        //最初、mgoodsにdelete_flagに値を入れる
+        //$mgoods -> delete_flag = $request->delete_flag->default(false);
+        $mgoods = new Mgood; 
+        $mgoods -> delete_flag = $request->delete_flag;  //falseだとbooleanに０が入る
+        $mgoods -> movie_id = $request->movie_id; 
+        $mgoods -> user_id = $request->user_id;
+        $mgoods -> save();//databaseにコメント情報を登録したい
+        
+        //2回目以降、mgoodsのdelete_flagカラムを確認し、切り替える
+        //return "ABC";     
+    
+        //いいね数を表示させるための変数
+        $count_favorite_users = $mgoods->user_id()->count();
+        return view('top',['count_favorite_users'=>$count_favorite_users,]);
+        
+    }
+    
+    
 
         
-    //動画追加画面表示********************************************************* 
+    //動画追加画面表示************************************************************************************* 
     public function upload2()
     {
         //phpinfo();
         return view('uploads2');
     }
-              
-    
+       
         
    //動画追加******************************************************************
     public function store2(Request $request)     
@@ -153,16 +173,13 @@ class MoviesController extends Controller
     
         //バリデーション
         $validator = Validator::make($request->all(), [
-           //'id' => 'required',
-            // 'user_id' => 'required',
-            // 'movie_url' => 'required',
-            // 'user_comment' => 'required|max:200',
-            // 'published' => 'required',
+            'item_movie'   => 'required | mimes:mp4,qt,x-ms-wmv,mpeg,x-msvideo', //動画であること
+            'user_comment' => 'required | max:200',
         ]);
     
         //バリデーション:エラー
         if ($validator->fails()) {
-            return redirect('/')
+            return redirect('/upload2')
                 ->withInput()
                 ->withErrors($validator);
         }
@@ -173,9 +190,7 @@ class MoviesController extends Controller
         //file が空かチェック     
         if( !empty($file) )
         {  
-        //ファイル名を取得         
-        //$filename = $file->getClientOriginalName(); 
-         
+
         //ファイル名をランダム化
         $filename = str_random(10);
           
@@ -194,7 +209,6 @@ class MoviesController extends Controller
         $uploads->movie_url = 'test'; //$request->'movie_url';
         $uploads->user_comment = $request->user_comment;
         $uploads->item_movie = $filename;
-      //  $uploads->published   =  $request->published;
         //$uploads->code = $filename;
         $uploads->save();
         return redirect('/upload2');
@@ -219,10 +233,25 @@ class MoviesController extends Controller
     //管理画面で情報更新(工事中→12/03済 念のため前のコード消してない)*******************************************************
     public function user_update(Request $request){//
         //データ更新    
-
+      
+        //バリデーション
+        $validator = Validator::make($request->all(), [
+    
+            'user_image'   => 'Image', //画像であること
+            'name'  => 'required | max:20',
+            'email' => 'required |email| unique:users | max:100', //メアドであること
+        ]);
+    
+        //バリデーション:エラー
+        if ($validator->fails()) {
+            return redirect('/management')
+                ->withInput()
+                ->withErrors($validator);
+        }
+        
         //file 取得     
         $file = $request->file('user_image');
-        $request = \Image::make($request)->resize(200, null)->save(public_path() . '/image/' .'resize-noimage.png');
+       //$request = \Image::make($request)->resize(200, null)->save(public_path() . '/image/' .'resize-noimage.png');
         
         //$file = $image->getClientOriginalName();
         //幅300に合わせる

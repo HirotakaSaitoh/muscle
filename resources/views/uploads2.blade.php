@@ -5,7 +5,8 @@
 <div class="container">
     <!--<div class="card-body">-->
         <div class="card-title">
-            孤高の筋肉をUPしたまえ
+            孤高の筋肉をUPしたまえ<br>
+            　
         </div>
         
         <!-- バリデーションエラーの表示に使用-->
@@ -25,18 +26,21 @@
             <div class="row">
                 <div class="col-md-6">
                    <label>動画</label>  
-                   <input type="file" name="item_movie"> 
+                   <input type="file" name="item_movie"> <br>
+                    
                 </div>
             </div>
             
             <div class="row">
             
                <div class="col-sm-6">   
-                <label for="user_comment" class="col-sm-3">コメント</label>
-                <input type="text" name="user_comment" class="col-sm-6">
-               </div> 
+                <label for="user_comment" class="col-sm-3">コメント(200文字以内)</label>
+                <input type="text" name="user_comment" class="col-sm-8">
+               </div>
+            
                
-            </div>
+            </div><br>
+            　
             
             <div class="row">
                 <div class=" col-sm-6">

@@ -2,6 +2,11 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+    
+    <!-- バリデーションエラーの表示に使用-->
+    @include('common.errors')
+
+    
         <!--左側カラムのタブ-->
     <div class="col-sm-3 col-md-4">
         <ul>
@@ -18,7 +23,6 @@
             {{ csrf_field() }}
         
             @if($mane->user_image == null)
-                <!--アイコンの画像UP出来るようにしたいね！-->
                 <img src="/upload/image/noimage.png" class="img-thumbnail w-25"  >
             @else
                 <img src="/upload/image/{{$mane->user_image}}" >

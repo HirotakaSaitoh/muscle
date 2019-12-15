@@ -7,9 +7,10 @@
                
         <div class="row">
             @if($query2->user_image == null)
-                <img src="/upload/image/noimage.png" class="img-thumbnail w-25" >
+                <img src="/upload/image/noimage.png"  class="mx-auto d-block">
+                <!--class="img-thumbnail w-25"-->
             @else
-                <img src="/upload/image/{{$query2->user_image}}">
+                <img src="/upload/image/{{$query2->user_image}}"class="mx-auto d-block">
             @endif    
             
             <div class="col-sm-2">{{'名前：' . $query2->name }}</div>

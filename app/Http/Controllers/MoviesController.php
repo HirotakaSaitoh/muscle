@@ -61,98 +61,77 @@ class MoviesController extends Controller
         $user = $userQuery->first();
         $uploads->user_name = $user->name;   //ここのuser_name(変数)はblade.phpへ渡す時の変数と同じ変数名にす
         
-        
         //movieCommentをぶっ飛ばす処理（同期処理ですみませんでした、Vue頑張ります；；）
         $movieComment = Movie::leftJoin("moviecomments","movie_id","=", "movies.id")->where( 'movie_id',$uploads->id)->get();
-       
+        $commentUser = User::leftJoin("moviecomments","user_id","=", "users.id")->where( 'movie_id',$uploads->id)->get();
         
-        //judgeをぶっ飛ばす処理（同期処理ですみませんでした、Vue頑張ります；；）
-        $judgemen = Movie::leftJoin("mgoods","movie_id","=", "movies.id")->where( 'movie_id',$uploads->id)->get();
-        //↑Topのmgoods,movieの動画情報をゲット(d)
+        $iineCount = Mgood::where("movie_id", $uploads->id)->where("delete_flag", 0)->count();
         
-        //取り出したいのは、mgoodsのmovie_idとuser_id
-        //$judge = DB::select('select * from mgoods where movie_id = ? and user_id = ?', [$judgemen->user_id]);
-        
-        
-        $judge = Mgood::where('user_id',$myData->id)->get();
-        
-            return view('top', ['uploads' => $uploads, 'myData' => $myData,'movieComment' => $movieComment, 'd' => $judgemen,'judge' => $judge,]);   
+        //今見てる人がイイねをしてるのかどうかを判断する
+        //条件文（表示切替ボタンの切り替えと表示件数が＋１に出来るかー１に出来るか切り替え）
+ 
+        if(!isset($commentUser[0]))
+        {$chk=0;
+        }else{ 
+        $chk=1;
+        }
+
+     
+            return view('top', ['uploads' => $uploads, 'myData' => $myData,'movieComment' => $movieComment,'commentUser' => $commentUser, 'iineCount'=>$iineCount,'chk'=>$chk]);   
     }
 
     
-    
-    
     //topページコメント追加(非同期処理)********************************************************* 
     public function comment_store(Request $request){
-        //$myData = Auth::user();
-       // $uploads = Movie::orderBy('created_at', 'desc')->first(); 
-       // $movieInfo = Movie::find($request->id);  //MovieのIDを取得する
+
         $movieComment = new Moviecomment; 
         $movieComment -> movie_id = $request->movie_id; 
         $movieComment -> user_id = $request->user_id;
         $movieComment -> movie_comment = $request->movie_comment;
-        $movieComment -> comment_time = $request->playtime;
+        $movieComment -> comment_time = $request->comment_time;
         $movieComment -> save();//databaseにコメント情報を登録したい
      
-       //return redirect('/');
+    }
+
+    
+    
+    
+    
+    
+    //topページコメント削除(非同期処理)********************************************************* 
+    public function comment_delete(Request $request){
+        
+        $commentDelete = Moviecomment::findOrFail($request->id);
+        $commentDelete->delete();
+    
     }
     
-    
-    
      
-    //topページいいね機能(いいねを押すとエラーが出る　"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'c9.post' doesn't exist (SQL: select * from `post` where `movie_id` is null limit 1)")*******************************************************
-    // public function favorite(Request $request){
-        
-    //     $movie_id = $request->id;
-    //     $name = Mgood::where('movie_id', $movie_id)->get(['user_id']);//TOPに表示されている動画のいいね情報をGET
-         
-        
-    //     if($name=""){       //誰もいいねしていないならば→いいね登録
-    //         $names = Auth::user()->id;
-    //         DB::insert('insert into mgoods (movie_id, user_id) values (?,?)',[$movie_id,$names]);            
-    //         $judge = [$movie_id,$names];
-    //         return view('top', ['judge' => $judge, 'd' => $movie_id]);
-            
-    //     }else{      //誰かがいいねをしているならば
-            
-    //         //$names = $name[2];   //mgoodsテーブルのuser_id
-    //         //$user = Auth::user();
-    //         //$favname = $user['name'];//ログインユーザー情報のnameだけ取ってくる。
-    //       $judge = Mgood::select('select * from mgoods where movie_id = ? and user_id = ?', [$movie_id, $name]);
-    //       // $judge = DB::select('select * from mgoods where movie_id = ? and user_id = ?', [$movie_id, $name]);
-            
-    //         if(!$judge){
-    //             DB::insert('insert into mgoods (movie_id, user_id) values (?,?)',[$movie_id,$name]);            
-    //             $judge = [$movie_id,$name];
-    //         }else{
-    //             DB::delete('delete from mgoods where movie_id = ? and user_id = ?',[$movie_id,$name]);     
-    
-    //         }
-    
-    //         //return redirect()->back()->withInput();
-    //         return view('top', ['judge' => $judge, 'd' => $movie_id]);
-
-    // }}
-    
-    
-    
+ 
     //topページいいね機能(非同期処理)*********************************************************************
     public function favorite(Request $request){ //DBの受け渡し
-    
-        //最初、mgoodsにdelete_flagに値を入れる
-        //$mgoods -> delete_flag = $request->delete_flag->default(false);
-        $mgoods = new Mgood; 
-        $mgoods -> delete_flag = $request->delete_flag;  //falseだとbooleanに０が入る
-        $mgoods -> movie_id = $request->movie_id; 
-        $mgoods -> user_id = $request->user_id;
-        $mgoods -> save();//databaseにコメント情報を登録したい
+        $GU = Mgood::where('user_id', $request->user_id)
+        ->where('movie_id', $request->movie_id)
+        ->first();
+      
+        if($GU==""){       //mgoodsにdelete_flagが入っていない場合、値を入れる
+            $mgoods = new Mgood; 
+            $mgoods -> delete_flag = $request->delete_flag;  //falseだとbooleanに０が入る
+            $mgoods -> movie_id = $request->movie_id; 
+            $mgoods -> user_id = $request->user_id;
+            $mgoods -> save();//databaseにコメント情報を登録したい
         
+        }else{           //mgoodsにdelete_flagが入っていない場合、値を入れ替える
+            $GU->delete_flag = $request->delete_flag;
+            $GU->save();
+        }
+
         //2回目以降、mgoodsのdelete_flagカラムを確認し、切り替える
         //return "ABC";     
     
-        //いいね数を表示させるための変数
-        $count_favorite_users = $mgoods->user_id()->count();
-        return view('top',['count_favorite_users'=>$count_favorite_users,]);
+        //いいね数を表示させるための変数(工事中)
+        // $count_favorite_users = $mgoods->user_id()->count();
+        // return view('top',['count_favorite_users'=>$count_favorite_users,]);
         
     }
     
@@ -195,7 +174,7 @@ class MoviesController extends Controller
         $filename = str_random(10);
           
         //ファイル名を取得         
-        $move = $file->move('../upload/m/',$filename.".mp4"); //public/upload/...　　public/upload/mフォルダに入る
+        $move = $file->move('../upload/m/',$filename.".mp4"); //public/upload/...  public/upload/mフォルダに入る
                   
         }else{         
             $filename = "";     
@@ -239,9 +218,9 @@ class MoviesController extends Controller
     
             'user_image'   => 'Image', //画像であること
             'name'  => 'required | max:20',
-            'email' => 'required |email| unique:users | max:100', //メアドであること
+            'email' => 'required |email| max:100', //メアドであること
         ]);
-    
+     
         //バリデーション:エラー
         if ($validator->fails()) {
             return redirect('/management')
@@ -269,7 +248,7 @@ class MoviesController extends Controller
         $filename = $file->getClientOriginalName(); 
           
         //ファイルを移動         
-        $move = $file->move('../upload/image/',$filename); //public/upload/...　　public/upload/imageフォルダに入る
+        $move = $file->move('../upload/image/',$filename); //public/upload/...  public/upload/imageフォルダに入る
                   
         }else{         
             $filename = "";     
@@ -277,9 +256,9 @@ class MoviesController extends Controller
 
 
         $mane = User::find($request->id);   
-        $mane->name      = $request->name;   
+        $mane->name = $request->name;   
         $mane->introduce = $request->introduce;   
-        $mane->email     = $request->email;  
+        $mane->email = $request->email;  
         $mane->user_image = $filename;
         $mane->save();   
         return redirect('/management');//～～～～～～～～/user/{user_name}に遷移したいけどまだやり方わからず～～～～～～～～～～
@@ -317,7 +296,7 @@ class MoviesController extends Controller
         $myData = Auth::user();
 
         
-        // ->limit(5)->get(); 5件とれる　　　//limit() 件数を指定して取れる
+        // ->limit(5)->get(); 5件とれる  limit() 件数を指定して取れる
         $m_name = Movie::where('item_movie', $movie_item_name)->get();   //whereで条件を絞る$movie_item_nameはURLと同じものを取得している
 
         
@@ -332,4 +311,12 @@ class MoviesController extends Controller
    $name = Mgood::where('movie_id', 3)->get(['user_id']);
       return view('test',['name'=>$name]);
     }
+    
+    //ログアウト処理
+     public function getLogout(){
+     return Auth::logout();
+      
+    }
+    
+    
 }

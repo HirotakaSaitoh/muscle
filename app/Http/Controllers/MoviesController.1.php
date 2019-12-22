@@ -263,7 +263,11 @@ class MoviesController extends Controller
         ]);
         
     }
-   
     
+    //ログアウト処理
+     public function getLogout(){
+     Auth::logout();
+    return redirect('/');
+     }
     
 }

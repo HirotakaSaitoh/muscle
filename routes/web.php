@@ -9,8 +9,13 @@ Route::get('/', 'MoviesController@top');
 //topページ でコメントを追加 
 Route::post('/movie/comment_store', 'MoviesController@comment_store');  //comment_storeページと言うviewの無い更新ページを作ってリダイレクトでページに戻す
 
+//topページ でコメント削除 
+Route::post('/movie/comment_delete', 'MoviesController@comment_delete');  //comment_deleteページと言うviewの無い更新ページを作ってリダイレクトでページに戻す
+
+
 //topページ いいね機能
 Route::post('/favorite', 'MoviesController@favorite');
+
 
 
 
@@ -26,6 +31,8 @@ Route::match(['get','post'], '/m/{movie_item_name}', 'MoviesController@movie'); 
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
+//ログアウト
+Route::get('/logout', 'MoviesController@getLogout');
 
 //accountページの動画を順番に表示
 Route::get('/user/{user_name}', 'MoviesController@index');
@@ -63,7 +70,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 //テストのやつ
-Route::get('/test', 'MoviesController@test');  //@はコントローラーと関数を結びつける
+Route::get('/test', 'MoviesController@favorite');  //@はコントローラーと関数を結びつける
 
 
 

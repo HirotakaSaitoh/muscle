@@ -18,10 +18,9 @@ class CreateMoviecommentsTable extends Migration
             $table->integer('movie_id')->unique(); //コメント対象の動画
             $table->integer('user_id'); //コメントしたユーザーのID
             $table->text('movie_comment',200)->nullable();  //コメント内容
-            $table->datetime('comment_time'); //投稿日時
+            $table->double('comment_time',8,3); //動画に対するコメント投稿時間,全8桁、少数点以下3桁
             $table->timestamps(); //投稿タイミング
         });
-        
         
     }
 

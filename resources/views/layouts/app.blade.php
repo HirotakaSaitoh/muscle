@@ -16,7 +16,8 @@
     
     <!--Font Awesomeのアイコンを埋め込む準備-->
     <script src="https://kit.fontawesome.com/b7d8a8cbdb.js" crossorigin="anonymous"></script>
-   
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>  
 
 <!--<script src="{{ asset('js/app.js') }}" defer></script>-->
 
@@ -56,25 +57,29 @@
                             <li><a href="{{ route('login') }}">Login</a></li>
                             <li><a href="{{ route('register') }}">Register</a></li>
                         @else
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
+                            <div class="dropdown">
+                                <button type = "button" id="dropdownMenuButton" class="btn btn-outline-light dropdown-toggle" data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false">
+                                    {{ Auth::user()->name }}
+                                </button>
 
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="{{ route('logout') }}"
+                               
+                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    
+                                        <a href="{{ ('/logout') }}" class="dropdown-item" 
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                             Logout
                                         </a>
-
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        <form id="logout-form" action="{{ ('/logout') }}" method="POST" style="display: none;">
                                             {{ csrf_field() }}
                                         </form>
-                                    </li>
-                                </ul>
-                            </li>
+                                       
+                                </div>   
+                                
+                                
+                                
+                                
+                            </div>
                         @endguest
                     </ul>
                 </div>

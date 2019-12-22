@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}"> 
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -13,6 +14,9 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css',true) }}" rel="stylesheet">
+    
+    <!--faviconの埋め込み-->
+    <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}">
     
     <!--Font Awesomeのアイコンを埋め込む準備-->
     <script src="https://kit.fontawesome.com/b7d8a8cbdb.js" crossorigin="anonymous"></script>
@@ -24,8 +28,8 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top" style="background-color: #003B46;">
-            <!--2A3132   003B46 021C1E CDCDC0 1E1F26-->
+        <nav class="navbar navbar-default navbar-static-top" style="background-color: #000000;">
+            <!--2A3132   003B46 021C1E CDCDC0 1E1F26 f4f4f4-->
         <!--<nav class="navbar navbar-default navbar-static-top navbar-dark bg-dark"> -->
             <div class="container">
                 <div class="navbar-header">
@@ -40,8 +44,9 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', '筋肉満') }}
+                         <img src="/upload/image/iconP2.png"></img>
                     </a>
+                    <img src="/upload/image/pankchii.jpg"></img>
                 </div>
 
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
@@ -58,7 +63,8 @@
                             <li><a href="{{ route('register') }}">Register</a></li>
                         @else
                             <div class="dropdown">
-                                <button type = "button" id="dropdownMenuButton" class="btn btn-outline-light dropdown-toggle" data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false">
+                               
+                                <button type = "button" id="dropdownMenuButton" class="btn btn-success" data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false">
                                     {{ Auth::user()->name }}
                                 </button>
 

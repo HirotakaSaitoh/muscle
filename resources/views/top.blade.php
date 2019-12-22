@@ -22,26 +22,27 @@
             
            <div id="comment">
             @foreach ($commentUser as $cu) 
-                <div id = "comment_clear" name='{{ $cu -> id}}'>
+                <div id = "comment_clear">
                     
-                    <p id="{{ $cu -> id}}">                    
+                    <p id="{{ $cu -> id}}" class="userComment">                    
                         <a href="/user/{{ $cu -> name}}">
                             <b>{{ $cu -> name}}</b>
                         </a>
                         <i class="far fa-comments"></i> {{ $cu -> movie_comment}}
                         <input type="button" id="clear" name='{{ $cu -> id}}'  value="削除筋" class="btn btn-warning btn-sm" >
                     </p>
-                
+                   
                 </div>
             @endforeach    
            </div>
         </div>
         
         <!--test-->
-        <div id="test" name="test2">
-            <input type="button" id="button" value="ハイオク満タン"/>
-            <p id="ppp" name="mantan">Huuuuuuuuuuuuu</p>
-        </div>
+        <!--<div id="test" name="test2">-->
+           
+        <!--    <input type="button" id="button" value="ハイオク満タン"/>-->
+        <!--    <p id="ppp" name="mantan">Huuuuuuuuuuuuu</p>-->
+        <!--</div>-->
 
        
        <!--右側カラム-->
@@ -59,15 +60,15 @@
             <div>{{ $uploads->published }}</div>
             
             
-                <div>コメント：<input type="text" name="movie_comment" id="movie_comment" maxlength="20"></div>
-                <input type="button" name="movie_comment_button" id="movie_comment_button"  value="君の掛け声が筋肉になるよ(コメント投稿)！！">
+                <div class="commentButton">コメント：<input type="text" name="movie_comment" id="movie_comment" maxlength="40"></div>
+                <input type="button" name="movie_comment_button" id="movie_comment_button" class="btn btn-light" value="君の掛け声が筋肉になるよ(コメント投稿)！！">
                 
             
             <!--いいねボタン-->
             
              <!-- いいね数表示    delete_flagの数を表示する-->
-             <div>
-                 <input type="button" name="good" id="good" value="よっ！夏の筋肉大三角形(いいね)！"/>
+             <div class="iineButton">
+                 <input type="button" name="good" id="good" class="btn btn-primary" value="よっ！夏の筋肉大三角形(いいね)！"/>
                  <i class="far fa-heart"></i>{{$iineCount}}
              </div>
 
@@ -84,6 +85,7 @@
 
 <!--スクリプト開始-->
 <script>
+
 
     //いいねの非同期処理を書く*********************************************************************
     
@@ -161,8 +163,7 @@
                     var playtime = media.currentTime;//再生時間を取得する 
                     
                     var formdata_comment = new FormData();
-                   
-        
+                  
                         formdata_comment.append('user_id', '{{$myData->id}}');   //コメントテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
                         formdata_comment.append('movie_id', '{{$uploads->id}}');   //コメントテーブルのmovie_idをPOST   第一引数はコントローラー側で受け取りたい名前
                         
@@ -183,8 +184,6 @@
                     
                     var div = document.createElement("div");  //htmlのdivをつくる
                     var p = document.createElement("p");
-                        
-                        
                         
                         div.appendChild(icon);
                         comment.insertBefore(div, comment.firstChild);  //コメントdivに入っている一番最初の要素の手前にaaaを加える
@@ -246,8 +245,10 @@
                     xhr.setRequestHeader('X-CSRF-Token', token3); 
                     xhr.send(formdata_delete);
                     
+                   
+                    
                     var clear_id = document.getElementById("comment_clear");
-                    var p_id = document.getElementById("@{{ $cu -> id}}");
+                    var p_id = document.getElementById("@{{$cu -> id}}");
                     //　var c_id2 = clearElement2.getAttribute("id"); //コメントしたユーザーIDの紐づいた削除ボタンの紐づいた「comment,name,button」のNameを取ってくる
                     
                     clear_id.removeChild(p_id);

@@ -36,7 +36,7 @@ class MoviesController extends Controller
         $myData = Auth::user();//myaccountかどうかの分岐に使用
         
         
-        $query = User::leftJoin("movies","user_id","=", "users.id")->where('name', $user_name)->get();   //joinさせてからwhereで条件を絞る$user_nameはURLと同じものを取得している
+        $query = User::leftJoin("movies","user_id","=", "users.id") ->where('name', $user_name)->orderBy('movies.id', 'desc')->get();   //joinさせてからwhereで条件を絞る$user_nameはURLと同じものを取得している
         //$query2 = User::leftJoin("movies","user_id","=", "users.id")->where('name', $user_name)->first(); 
         $query2 = User::where('name', $user_name)->first(); 
         //dd($query); //For checking(デバック方法)
@@ -56,6 +56,8 @@ class MoviesController extends Controller
     { 
         $uploads = Movie::orderBy('created_at', 'desc')->first();   
         $myData = Auth::user();
+        $myid = $myData->id;
+        $myname = $myData->name;
         $userQuery = User::query(); //
         $userQuery->where('id',$uploads->user_id);//whereでuser tableのidとmovie tableのidが一致しているのを呼び出し、userQueryにぶち込んでいる。
         $user = $userQuery->first();
@@ -63,7 +65,7 @@ class MoviesController extends Controller
         
         //movieCommentをぶっ飛ばす処理（同期処理ですみませんでした、Vue頑張ります；；）
         $movieComment = Movie::leftJoin("moviecomments","movie_id","=", "movies.id")->where( 'movie_id',$uploads->id)->get();
-        $commentUser = User::leftJoin("moviecomments","user_id","=", "users.id")->where( 'movie_id',$uploads->id)->get();
+        $commentUser = User::leftJoin("moviecomments","user_id","=", "users.id")->where( 'movie_id',$uploads->id)->get(); //movieに紐づいたuserのコメント情報を取得
         
         $iineCount = Mgood::where("movie_id", $uploads->id)->where("delete_flag", 0)->count();
         
@@ -75,9 +77,13 @@ class MoviesController extends Controller
         }else{ 
         $chk=1;
         }
+        
+        
+        
+        //ログインしていない場合は、myDataの空のidを渡す
 
      
-            return view('top', ['uploads' => $uploads, 'myData' => $myData,'movieComment' => $movieComment,'commentUser' => $commentUser, 'iineCount'=>$iineCount,'chk'=>$chk]);   
+            return view('top', ['uploads' => $uploads, 'myData' => $myData,'movieComment' => $movieComment,'commentUser' => $commentUser, 'iineCount'=>$iineCount,'chk'=>$chk, 'myid'=>$myid,'myname'=>$myname]);   
     }
 
     

@@ -22,18 +22,23 @@
             
            <div id="comment">
             @foreach ($commentUser as $cu) 
-                <div id = "comment_clear">
+                <div>
                     
                     <p id="{{ $cu -> id}}" class="userComment">                    
-                        <a href="/user/{{ $cu -> name}}">
+                        <a href="/user/{{ $cu -> name}}" class="link">
                             <b>{{ $cu -> name}}</b>
                         </a>
                         <i class="far fa-comments"></i> {{ $cu -> movie_comment}}
-                        <input type="button" id="clear" name='{{ $cu -> id}}'  value="削除筋" class="btn btn-warning btn-sm" >
+                        @if($cu->user_id == $myData ->id )
+                        <input type="button" name="clear" value="削除筋" class="btn btn-warning btn-sm" onclick="deleteC('{{ $cu -> id}}');" >
+                        @endif
                     </p>
                    
                 </div>
-            @endforeach    
+            @endforeach   
+            
+            
+            
            </div>
         </div>
         
@@ -86,6 +91,36 @@
 <!--スクリプト開始-->
 <script>
 
+     // buttonを押したら非同期でコメントが削除される(DBも)*************************************************************
+    function deleteC(id){
+        var deleteConfirm = confirm('その削除、筋肉量を2g失うが大丈夫でしょうか？');
+                
+        if(deleteConfirm == true){//コメント削除する選択
+        	var dom_obj = document.getElementById(id);
+            var dom_obj_parent = dom_obj.parentNode;
+            dom_obj_parent.removeChild(dom_obj);
+            
+            var c_id = dom_obj.getAttribute("id"); //p->id
+            
+          //formdataに削除対象の情報を入れる
+            var formdata_delete = new FormData();
+                formdata_delete.append('id', c_id);   //コメントテーブルのidをPOST   第一引数はコントローラー側で受け取りたい名前
+            
+            
+            //非同期の削除処理をする
+            var xhr = new XMLHttpRequest();
+            
+            var token3 = document.getElementsByName('csrf-token3').item(0).content; 
+            
+            //xhr.open('DELETE', "movie/comment_delete", true);
+            xhr.open('POST', "movie/comment_delete", true);
+            xhr.setRequestHeader('X-CSRF-Token', token3); 
+            xhr.send(formdata_delete);
+            return c_id;
+        }else{}       //コメント削除しない選択
+        
+    }
+
 
     //いいねの非同期処理を書く*********************************************************************
     
@@ -110,7 +145,7 @@
                      //isIine = 0;
                     element.value = "ベテルギウス大爆発(取り消し)！！";
                     var formdata = new FormData();
-                    formdata.append('user_id', '{{$myData->id}}');   //いいねテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
+                    formdata.append('user_id', '{{$myid}}');   //いいねテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
                     formdata.append('movie_id', '{{$uploads->id}}');   //いいねテーブルのmovie_idをPOST   第一引数はコントローラー側で受け取りたい名前
                     formdata.append('delete_flag', '1');
                     
@@ -123,7 +158,7 @@
                      //isIine = 1;
                      element.value = "よっ！夏の筋肉大三角形(いいね)！！";
                      var formdata = new FormData();
-                     formdata.append('user_id', '{{$myData->id}}');   //いいねテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
+                     formdata.append('user_id', '{{$myid}}');   //いいねテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
                      formdata.append('movie_id', '{{$uploads->id}}');   //いいねテーブルのmovie_idをPOST   第一引数はコントローラー側で受け取りたい名前
                      formdata.append('delete_flag', '0');
                    
@@ -153,6 +188,8 @@
          window.addEventListener('load', function(){        //画面を読み込んだらScriptを実行
             var element2 = document.getElementById("movie_comment_button");
             //var m_comme = document.getElementById("movie_comment").value;
+            
+            
             element2.onclick = function (){
                 var m_comme = document.getElementById("movie_comment").value;
                 if(m_comme == ""){
@@ -164,7 +201,7 @@
                     
                     var formdata_comment = new FormData();
                   
-                        formdata_comment.append('user_id', '{{$myData->id}}');   //コメントテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
+                        formdata_comment.append('user_id', '{{$myid}}');   //コメントテーブルのuser_idをPOST   第一引数はコントローラー側で受け取りたい名前
                         formdata_comment.append('movie_id', '{{$uploads->id}}');   //コメントテーブルのmovie_idをPOST   第一引数はコントローラー側で受け取りたい名前
                         
                         formdata_comment.append('movie_comment', m_comme);
@@ -181,17 +218,38 @@
                     var comment = document.getElementById("comment");    //divのidを引っ張ってくる
                     var icon = document.createElement("i");
                         icon.className = "far fa-comments";
-                    
-                    var div = document.createElement("div");  //htmlのdivをつくる
+
+                    var div = document.createElement("div");  //htmlのdivをつくる　
                     var p = document.createElement("p");
+                    // var a = document.createElement("a");
+                    // a.href="/user/{{$myname}}";
+                    // var b = document.createElement("b");
+ //alert(c_id);
+                    var btn = document.createElement("input");
+                     btn.setAttribute("type","button");
+                     btn.setAttribute("value",'削除筋');
+                     btn.setAttribute("onclick",deleteC());
+                    btn.className = "btn btn-warning btn-sm";
+
+//                    var btnon = document.createElement("onclick");
+  //                  btn.appendChild(btnon);
+                    //btn.onclickName = "deleteC('1')";    
                         
-                        div.appendChild(icon);
                         comment.insertBefore(div, comment.firstChild);  //コメントdivに入っている一番最初の要素の手前にaaaを加える
-                        p.innerHTML = "{{$myData->name}}"  + " " +  m_comme;      //自分の名前を追加
+                        var MC = document.createTextNode(m_comme);
+                        // a.appendChild(Cname);
+                        // a.appendChild(icon);
+                        var Cname ='{{$myname}}';
+                        var URL = "/user/{{$myname}}";
+                        p.innerHTML = Cname.link(URL).bold(); //+ m_comme; //自分の名前を追加新しいフォーマットに直す
+                        p.appendChild(icon);
+                        p.appendChild(MC);
+                        //p.insertAdjacentHTML = m_comme;
                         div.appendChild(p);
+                        p.appendChild(btn);
                         
-                        
-                        
+                       //btn.onclick = deleteC(id); 
+
                     //投稿したコメントをテキストボックスから消す
                     var mc  = document.getElementById("movie_comment");
                     mc.value = "";
@@ -202,56 +260,52 @@
         })
         
         
+        //          <div>
+        //              <p id="{{ @$cu -> id}}" class="userComment">                    
+        //                 <a href="/user/{{ $cu -> name}}" class="link">
+        //                     <b>{{ $cu -> name}}</b>
+        //                 </a>
+        //                 <i class="far fa-comments"></i> {{ $cu -> movie_comment}}
+        //                 @if($cu->user_id == $myData ->id )
+        //                 <input type="button" name="clear" value="削除筋" class="btn btn-warning btn-sm" onclick="deleteC('{{ $cu -> id}}');" >
+        //                 @endif
+        //             </p>
+                   
+        //         </div>
+        
     //ユーザーコメントを削除する機能
   
-    var chk = '{{$chk}}';
+
+//     //userからのコメントがあるとき
     
-    //userからのコメントがないとき
-    if(chk== 0){
-    //alert('null');
-    
+//   window.addEventListener('load', function(){  
         
-    }else{
-    //userからのコメントがあるとき
-    
-   window.addEventListener('load', function(){  
-        
-        var clearElement = document.getElementById("clear");
-        clearElement.onclick = function (){
+//         var clearElement = document.getElementsByName("clear");  
+//         clearElement.onclick = function (){
                 
-                //alert('その削除、筋肉量を2g失うが大丈夫でしょうか？');
-                var deleteConfirm = confirm('その削除、筋肉量を2g失うが大丈夫でしょうか？');
+//                 //alert('その削除、筋肉量を2g失うが大丈夫でしょうか？');
+//                 var deleteConfirm = confirm('その削除、筋肉量を2g失うが大丈夫でしょうか？');
                 
-                if(deleteConfirm == true){
+//                 if(deleteConfirm == true){
                       
-                    var clearElement = document.getElementById("clear"); 
-                  　var c_id = clearElement.getAttribute('name'); //コメントしたユーザーIDの紐づいた削除ボタンのNameを取ってくる
-                    
-                    //var c_id = document.getElementsByName("userID"); 
-                    //formdataに削除対象の情報を入れる
-                    var formdata_delete = new FormData();
-                        formdata_delete.append('id', c_id);   //コメントテーブルのidをPOST   第一引数はコントローラー側で受け取りたい名前
+//                     var clearElement = document.getElementsByName("clear"); 
+//                   　var c_id = clearElement.getAttribute('id'); //コメントしたユーザーIDの紐づいた削除ボタンのNameを取ってくる
                     
                     
-                    //非同期の削除処理をする
-                    var xhr = new XMLHttpRequest();
-                    
-                    var token3 = document.getElementsByName('csrf-token3').item(0).content; 
-                    
+                  
 
                     
-                    //xhr.open('DELETE', "movie/comment_delete", true);
-                    xhr.open('POST', "movie/comment_delete", true);
-                    xhr.setRequestHeader('X-CSRF-Token', token3); 
-                    xhr.send(formdata_delete);
-                    
+                    //var c_id = document.getElementsByName("userID"); 
+
+//247-263を97行目にぶち込む。moviecommnetのidは既にあるからidを使うだけ
+          
                    
                     
-                    var clear_id = document.getElementById("comment_clear");
-                    var p_id = document.getElementById("@{{$cu -> id}}");
+                    //var clear_id = document.getElementById("comment_clear");
+                    //var p_id = document.getElementById("@{{$cu -> id}}");
                     //　var c_id2 = clearElement2.getAttribute("id"); //コメントしたユーザーIDの紐づいた削除ボタンの紐づいた「comment,name,button」のNameを取ってくる
                     
-                    clear_id.removeChild(p_id);
+                    //clear_id.removeChild(p_id);
                     
                 //     //削除したコメントを非表示にする
                 //     var clearElement2 = document.getElementById("comment_clear"); 
@@ -260,36 +314,36 @@
                 //     clearElement2.removeChild(c_id2);
 
 
-                }else{
+                // }else{
                     
-                    //error処理を書く
-                }
+                //     //error処理を書く
+                // }
         
 
-        };
-    })
+        // };
+    // })
 
 
-    }
+    // }
     
     
         
 
   
    // test用
-    window.addEventListener('load', function(){ 
-    var aaa = document.getElementById("button");
+    // window.addEventListener('load', function(){ 
+    // var aaa = document.getElementById("button");
     
-    aaa.onclick = function (){
+    // aaa.onclick = function (){
         
-    var bbb = document.getElementById("test");  // div ->id
-    var c = document.getElementById("ppp"); //p ->id
-    //var t2 = c.getAttribute("name");//p ->name
+    // var bbb = document.getElementById("test");  // div ->id
+    // var c = document.getElementById("ppp"); //p ->id
+    // //var t2 = c.getAttribute("name");//p ->name
     
-      bbb.removeChild(c);
+    //   bbb.removeChild(c);
       
-    };
-    })
+    // };
+    // })
 
 
 

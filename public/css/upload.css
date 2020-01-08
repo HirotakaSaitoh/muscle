@@ -1,0 +1,16 @@
+.card-title{
+    text-align: center;
+}
+
+.col-md-12{
+   display: flex;
+   justify-content: center;
+   padding:5%;
+}
+
+
+.col-sm-12{
+   display: flex;
+   justify-content: center;
+   padding:2%;
+}

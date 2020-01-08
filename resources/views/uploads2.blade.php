@@ -1,4 +1,5 @@
 <!-- resources/views/uploads.blade.php -->
+<link rel="stylesheet" href="{{ asset('css/upload.css') }}"> 
 @extends('layouts.app')
 @section('content')
     <!-- Bootstrapの定形コード… -->
@@ -24,8 +25,8 @@
             
             
             <div class="row">
-                <div class="col-md-6">
-                   <label>動画</label>  
+                <div class="col-md-12">
+                   <label></label>  
                    <input type="file" name="item_movie"> <br>
                     
                 </div>
@@ -33,8 +34,8 @@
             
             <div class="row">
             
-               <div class="col-sm-6">   
-                <label for="user_comment" class="col-sm-3">コメント(200文字以内)</label>
+               <div class="col-sm-12">   
+                <label for="user_comment" class="col-sm-3">コメント(200文字以内)<br></label>
                 <input type="text" name="user_comment" class="col-sm-8">
                </div>
             
@@ -43,10 +44,10 @@
             　
             
             <div class="row">
-                <div class=" col-sm-6">
+                <div class=" col-sm-12">
                 
                     <button type="submit" class="btn btn-info">
-                    Save
+                    Upload 200kg
                     </button>
                 </div>
             </div>
